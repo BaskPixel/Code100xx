@@ -192,7 +192,6 @@ void DFSTraver(AdjGraph* G)
 		}
 	}
 }
-
 //计算所有顶点的入度
 void DFS2(AdjGraph* G, int vi, int visited[], int& a)
 {
@@ -223,42 +222,37 @@ int inDegree(AdjGraph* G)
 	}
 	return inNums;
 }
-//判断顶点vi到vj是否有路径
-int Q[1024];
-int front, rear;
-void BFS(AdjGraph G, int vi, int visited[])
-{
-	visited[vi] = true;
-	EdgeNode* p = G.vertex[vi].firstEdge;
-
-	while (p)
-	{
-		if (visited[p->adjvex] == false)
-		{
-			Q[++rear] = p->adjvex;
-			visited[p->adjvex] = true;
-		}
-		p = p->nextEdge;
-	}
-}
+#pragma region 判断顶点vi到vj是否有路径
 bool HasPathBFS(AdjGraph G, int vi, int vj)
 {
-	if (vi<0 || vj <0 || vi >G.numNodes || vj > G.numNodes)return false;
+	if (vi<0 || vj <0 || vi >G.numNodes || vj > G.numNodes)return 0;
+	int Q[1024];
+	int front, rear;
 	int visited[1024];
 	for (int i = 0; i < G.numNodes; i++)
 	{
-		visited[i] = false;
+		visited[i] = 0;
 	}
 	front = -1; rear = -1;
 	Q[++rear] = vi;
 	while (front < rear)
 	{
 		int next = Q[++front];
-		BFS(G, next, visited);
+		EdgeNode* p = G.vertex[next].firstEdge;
+		while (p)
+		{
+			if (visited[p->adjvex] == 0)
+			{
+				Q[++rear] = p->adjvex;
+				visited[p->adjvex] = 1;
+			}
+			p = p->nextEdge;
+		}
 	}
 	return visited[vj];
 }
-//输出从顶点Vi到Vj的所有简单路径
+#pragma endregion
+#pragma region 输出从顶点Vi到Vj的所有简单路径
 void FindPath(AdjGraph* G, int v, int u, int visited[], int path[], int d)
 {
 	visited[v] = true;
@@ -293,7 +287,7 @@ void FindPathDFS(AdjGraph* G, int vi, int vj)
 	}
 	FindPath(G, vi, vj, visited, path, 0);
 }
-
+#pragma endregion
 #pragma region 求无向无权连通图中距离顶点v的最短路径长度为k的所有结点
 void Find0(AdjGraph* G, int v, int k)
 {
@@ -373,6 +367,45 @@ void BFS4(AdjGraph* G, int vi, int vj)
 	cout << d[vj] << endl;
 }
 #pragma endregion
+#pragma region 判断有向图中r到G是否有根
+int a = 0;
+int b = 0;
+void DFS4(AdjGraph* G, int v, int visited[], int& n)
+{
+	n++;
+	visited[v] = 1;
+	EdgeNode* p = G->vertex[v].firstEdge;
+	while (p)
+	{
+		if (visited[p->adjvex] == false)
+		{
+			DFS4(G, p->adjvex, visited, n);
+		}
+		p = p->nextEdge;
+	}
+}
+void HasGen(AdjGraph* G)
+{
+	int n = 0;
+	int visited[1024];
+	for (int i = 0; i < G->numNodes; i++)
+	{
+		for (int j = 0; j < G->numNodes; j++)
+		{
+			visited[j] = 0;
+		}
+		n = 0;
+		DFS4(G, i, visited, n);
+		if (n == G->numNodes)
+		{
+			cout << G->vertex[i].data << " is gen" << endl;
+		}
+	}
+}
+#pragma endregion
+#pragma region 判断有向图中两个顶点是否有路径
+
+#pragma endregion
 
 
 int main()
@@ -383,12 +416,10 @@ int main()
 	//CreatAlGraph2(&G, data);
 	//DFSTraver(&G);
 	//cout << inDegree(&G);
-	//cout << HasPathBFS(G, 2, 3);
+	cout << HasPathBFS(G, 0, 2);
 	//FindPathDFS(&G, 0, 2);
 	//Find0(&G, 4, 1);
-	BFS4(&G, 0, 1);
-	BFS4(&G, 0, 2);
-	BFS4(&G, 0, 3);
-	BFS4(&G, 0, 4);
+	//BFS4(&G, 0, 1);
+	//HasGen(&G);
 	return 0;
 }
